@@ -10,7 +10,7 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: "Healthy" });
 });
 
-// Ruta estratégica para generar logs de errores en CloudWatch (IE1)
+// Ruta para generar logs de errores en cloudwatch
 app.get('/error', (req, res) => {
     console.error(`[ERROR] [${new Date().toISOString()}] Falla crítica simulada en el sistema.`);
     res.status(500).json({ status: "Error", message: "Falla simulada de auditoría" });
