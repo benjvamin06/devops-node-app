@@ -49,7 +49,7 @@ jobs:
           username: ubuntu                      
           key: ${{ secrets.EC2_SSH_KEY }}       
           script: |
-            cd /home/ubuntu/Proyecto || cd /home/ubuntu/devops-node-app
+            cd /home/ubuntu/Proyecto
             git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build
