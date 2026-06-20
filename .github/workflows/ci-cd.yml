@@ -28,10 +28,26 @@ jobs:
       - name: Ejecutar Pruebas Unitarias y Cobertura
         run: |
           chmod +x ./node_modules/.bin/jest
-          npm test
-          
+          npm test 
+
       - name: Escaneo de Cumplimiento Normativo con SonarCloud
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Configurar Credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
+          aws-region: us-east-1
+
+      - name: Actualizar Contexto de Kubernetes (EKS Cluster)
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name cluster-devops
+
+      - name: Desplegar Manifiestos en Kubernetes Orquestado
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml

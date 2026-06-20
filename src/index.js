@@ -1,23 +1,46 @@
 const express = require('express');
+const winston = require('winston');
+const expressWinston = require('express-winston');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-    res.status(200).json({ status: "OK", message: "Microservicio operativo" });
-});
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console() 
+  ],
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json() 
+  ),
+  meta: true,
+  msg: "HTTP {{req.method}} {{req.url}} - Status: {{res.statusCode}}",
+  expressFormat: true,
+  colorize: false
+}));
 
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: "Healthy" });
+  res.status(200).json({ status: 'UP', timestamp: new Date() });
 });
 
-// Ruta para generar logs de errores en cloudwatch
+app.get('/', (req, res) => {
+  res.send('Microservicio DevOps operando en AWS CloudWatch');
+});
+
 app.get('/error', (req, res) => {
-    console.error(`[ERROR] [${new Date().toISOString()}] Falla crítica simulada en el sistema.`);
-    res.status(500).json({ status: "Error", message: "Falla simulada de auditoría" });
+  throw new Error('Excepción simulada en el servidor');
 });
 
-const server = app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
+app.use(expressWinston.errorLogger({
+  transports: [
+    new winston.transports.Console()
+  ],
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  )
+}));
 
-module.exports = { app, server };
+app.listen(PORT, () => {
+  console.log(`Servidor iniciado exitosamente en el puerto ${PORT}`);
+});
