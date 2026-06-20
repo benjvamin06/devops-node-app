@@ -41,6 +41,8 @@ app.use(expressWinston.errorLogger({
   )
 }));
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Servidor iniciado exitosamente en el puerto ${PORT}`);
 });
+
+module.exports = { app, server };
